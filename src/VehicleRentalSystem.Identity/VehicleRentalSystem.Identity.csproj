@@ -13,4 +13,9 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\VehicleRentalSystem.Core\VehicleRentalSystem.Core.csproj" />
+    <ProjectReference Include="..\VehicleRentalSystem.RentalServices\VehicleRentalSystem.RentalServices.csproj" />
+  </ItemGroup>
+
 </Project>

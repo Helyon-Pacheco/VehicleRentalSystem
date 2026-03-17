@@ -10,7 +10,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.27.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="StackExchange.Redis" Version="2.12.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VehicleRentalSystem.Core\VehicleRentalSystem.Core.csproj" />
+    <ProjectReference Include="..\VehicleRentalSystem.Messaging\VehicleRentalSystem.Messaging.csproj" />
+    <ProjectReference Include="..\VehicleRentalSystem.Shared\VehicleRentalSystem.Shared.csproj" />
   </ItemGroup>
 
 </Project>

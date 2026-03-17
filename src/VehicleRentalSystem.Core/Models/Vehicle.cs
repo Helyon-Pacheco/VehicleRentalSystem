@@ -9,7 +9,7 @@ public class Vehicle : EntityBase
     public string Plate { get; set; } = string.Empty;
     public VehicleType VehicleType {  get; set; }
 
-    public virtual VehicleNotification? MotorcycleNotification { get; set; }
+    public virtual VehicleNotification? VehicleNotification { get; set; }
 
     public Vehicle()
     {
