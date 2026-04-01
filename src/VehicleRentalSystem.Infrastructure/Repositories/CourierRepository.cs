@@ -18,7 +18,7 @@ public class CourierRepository : Repository<Courier>, ICourierRepository
         _blobStorageService = blobStorageService;
     }
 
-    public async Task<Courier> GetByCnpj(string cnpj)
+    public async Task<Courier?> GetByCnpj(string cnpj)
     {
         try
         {
@@ -32,7 +32,7 @@ public class CourierRepository : Repository<Courier>, ICourierRepository
         }
     }
 
-    public async Task<Courier> GetByCnhNumber(string cnhNumber)
+    public async Task<Courier?> GetByCnhNumber(string cnhNumber)
     {
         try
         {
@@ -46,7 +46,7 @@ public class CourierRepository : Repository<Courier>, ICourierRepository
         }
     }
 
-    public async Task<string> AddOrUpdateCnhImage(string cnpj, Stream cnhImageStream)
+    public async Task<string?> AddOrUpdateCnhImage(string cnpj, Stream cnhImageStream)
     {
         try
         {

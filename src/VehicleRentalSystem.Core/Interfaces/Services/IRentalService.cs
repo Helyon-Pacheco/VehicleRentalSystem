@@ -11,7 +11,7 @@ public interface IRentalService
     Task<IEnumerable<Rental>> GetByCourierId(Guid courierId);
     Task<IEnumerable<Rental>> GetByVehicleId(Guid vehicleId);
     Task<IEnumerable<Rental>> GetActiveRentals();
-    Task<decimal> CalculateRentalCost(Rental rental);
+    decimal CalculateRentalCost(Rental rental);
     Task<bool> Add(Rental rental, string userEmail);
     Task<bool> Update(Rental rental, string userEmail);
     Task<bool> SoftDelete(Guid id, string userEmail);

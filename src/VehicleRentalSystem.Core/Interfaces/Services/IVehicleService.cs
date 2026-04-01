@@ -12,7 +12,7 @@ public interface IVehicleService
     Task<Vehicle?> GetByPlate(string plate);
     Task<Vehicle?> GetByType(VehicleType vehicleType);
     Task<IEnumerable<Vehicle>> GetAllByYear(int year);
-    Task<VehicleNotification> GetVehicleNotification(Guid id);
+    Task<VehicleNotification?> GetVehicleNotification(Guid id);
     Task<bool> Add(Vehicle vehicle, string userEmail);
     Task<bool> Update(Vehicle vehicle, string userEmail);
     Task<bool> SoftDelete(Guid id, string userEmail);

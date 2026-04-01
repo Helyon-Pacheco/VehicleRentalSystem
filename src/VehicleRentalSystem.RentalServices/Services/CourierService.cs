@@ -7,6 +7,7 @@ using VehicleRentalSystem.Core.Models;
 using VehicleRentalSystem.Core.Models.Validations;
 using VehicleRentalSystem.Core.Notifications;
 using VehicleRentalSystem.Messaging.Events;
+using VehicleRentalSystem.Shared.Services;
 
 namespace VehicleRentalSystem.RentalServices.Services;
 
@@ -23,7 +24,7 @@ public class CourierService : BaseService, ICourierService
         _redisCacheService = redisCacheService ?? throw new ArgumentNullException(nameof(redisCacheService));
     }
 
-    public async Task<Courier> GetById(Guid id)
+    public async Task<Courier?> GetById(Guid id)
     {
         try
         {
@@ -65,7 +66,7 @@ public class CourierService : BaseService, ICourierService
         }
     }
 
-    public async Task<Courier> GetByCnpj(string cnpj)
+    public async Task<Courier?> GetByCnpj(string cnpj)
     {
         try
         {
@@ -79,7 +80,7 @@ public class CourierService : BaseService, ICourierService
         }
     }
 
-    public async Task<Courier> GetByCnhNumber(string cnhNumber)
+    public async Task<Courier?> GetByCnhNumber(string cnhNumber)
     {
         try
         {

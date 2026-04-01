@@ -14,7 +14,7 @@ public class VehicleRepository : Repository<Vehicle>, IVehicleRepository
     {
     }
 
-    public async Task<Vehicle> GetByPlate(string plate)
+    public async Task<Vehicle?> GetByPlate(string plate)
     {
         try
         {
@@ -28,7 +28,7 @@ public class VehicleRepository : Repository<Vehicle>, IVehicleRepository
         }
     }
 
-    public async Task<Vehicle> GetByType(VehicleType vehicleType)
+    public async Task<Vehicle?> GetByType(VehicleType vehicleType)
     {
         try
         {

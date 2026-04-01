@@ -13,10 +13,15 @@ public class RedisCacheService : IRedisCacheService
         _database = connectionMultiplexer.GetDatabase();
     }
 
-    public async Task<T> GetCacheValueAsync<T>(string key)
+    public async Task<T?> GetCacheValueAsync<T>(string key)
     {
         var value = await _database.StringGetAsync(key);
-        return value.HasValue ? JsonConvert.DeserializeObject<T>(value) : default;
+
+        if (!value.HasValue)
+            return default;
+
+        var json = value.ToString();
+        return JsonConvert.DeserializeObject<T>(json);
     }
 
     public async Task SetCacheValueAsync<T>(string key, T value)

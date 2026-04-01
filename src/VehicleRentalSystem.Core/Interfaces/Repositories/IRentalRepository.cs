@@ -7,5 +7,5 @@ public interface IRentalRepository : IRepository<Rental>
     Task<IEnumerable<Rental>> GetByCourierId(Guid courierId);
     Task<IEnumerable<Rental>> GetByMotorcycleId(Guid motorcycleId);
     Task<IEnumerable<Rental>> GetActiveRentals();
-    Task<decimal> CalculateRentalCost(Rental rental);
+    decimal CalculateRentalCost(Rental rental);
 }

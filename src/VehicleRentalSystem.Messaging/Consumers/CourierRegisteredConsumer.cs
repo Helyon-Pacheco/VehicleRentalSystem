@@ -30,14 +30,19 @@ public class CourierRegisteredConsumer : IMessageConsumer
                 var message = Encoding.UTF8.GetString(body);
                 var courierRegisteredEvent = JsonConvert.DeserializeObject<CourierRegistered>(message);
 
-                await ProcessMessageAsync(courierRegisteredEvent);
+                if (courierRegisteredEvent is null)
+                {
+                    _logger.LogWarning("Received null or invalid message from queue '{QueueName}'. Discarding.", _queueName);
+                    await _channel.BasicNackAsync(ea.DeliveryTag, false, requeue: false);
+                    return;
+                }
 
+                await ProcessMessageAsync(courierRegisteredEvent);
                 await _channel.BasicAckAsync(ea.DeliveryTag, false);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing message");
-
                 await _channel.BasicNackAsync(ea.DeliveryTag, false, true);
             }
         };

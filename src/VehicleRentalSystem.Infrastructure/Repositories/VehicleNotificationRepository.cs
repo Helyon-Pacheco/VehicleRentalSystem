@@ -13,7 +13,7 @@ public class VehicleNotificationRepository : Repository<VehicleNotification>, IV
     {
     }
 
-    public async Task<VehicleNotification> GetByVehicleId(Guid vehicleId)
+    public async Task<VehicleNotification?> GetByVehicleId(Guid vehicleId)
     {
         try
         {

@@ -8,7 +8,10 @@ public class DataContextFactory : IDesignTimeDbContextFactory<DataContext>
 {
     public DataContext CreateDbContext(string[] args)
     {
-        var basePath = Directory.GetParent(Directory.GetCurrentDirectory()).FullName;
+        var parentDirectory = Directory.GetParent(Directory.GetCurrentDirectory())
+            ?? throw new InvalidOperationException("Could not determine the parent directory of the current working directory.");
+
+        var basePath = parentDirectory.FullName;
         var apiProjectPath = Path.Combine(basePath, "BikeRentalSystem.Api");
 
         var configuration = new ConfigurationBuilder()

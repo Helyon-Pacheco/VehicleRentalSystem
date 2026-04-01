@@ -7,6 +7,7 @@ using VehicleRentalSystem.Core.Models;
 using VehicleRentalSystem.Core.Models.Validations;
 using VehicleRentalSystem.Core.Notifications;
 using VehicleRentalSystem.Messaging.Events;
+using VehicleRentalSystem.Shared.Services;
 
 namespace VehicleRentalSystem.RentalServices.Services;
 
@@ -23,7 +24,7 @@ public class RentalService : BaseService, IRentalService
         _redisCacheService = redisCacheService ?? throw new ArgumentNullException(nameof(redisCacheService));
     }
 
-    public async Task<Rental> GetById(Guid id)
+    public async Task<Rental?> GetById(Guid id)
     {
         try
         {
@@ -107,12 +108,12 @@ public class RentalService : BaseService, IRentalService
         }
     }
 
-    public async Task<decimal> CalculateRentalCost(Rental rental)
+    public decimal CalculateRentalCost(Rental rental)
     {
         try
         {
             _notifier.Handle("Calculating rental cost");
-            return await _unitOfWork.Rentals.CalculateRentalCost(rental);
+            return _unitOfWork.Rentals.CalculateRentalCost(rental);
         }
         catch (Exception ex)
         {
@@ -137,41 +138,39 @@ public class RentalService : BaseService, IRentalService
             return false;
         }
 
-        using (var transaction = await _unitOfWork.BeginTransactionAsync())
+        using var transaction = await _unitOfWork.BeginTransactionAsync();
+        try
         {
-            try
+            var (vehicle, courier) = await GetForeignEntities(rental.VehicleId, rental.CourierId);
+
+            rental.CreatedByUser = userEmail;
+            rental.Vehicle = vehicle;
+            rental.Courier = courier;
+            rental.TotalCost = CalculateRentalCost(rental);
+
+            await _unitOfWork.Rentals.Add(rental);
+            var result = await _unitOfWork.SaveAsync();
+
+            if (result > 0)
             {
-                var (vehicle, courier) = await GetForeignEntities(rental.VehicleId, rental.CourierId);
+                await transaction.CommitAsync();
+                _notifier.Handle("Rental added successfully");
 
-                rental.CreatedByUser = userEmail;
-                rental.Vehicle = vehicle;
-                rental.Courier = courier;
-                rental.TotalCost = await CalculateRentalCost(rental);
+                PublishRentalRegisteredEvent(rental);
+                await _redisCacheService.RemoveCacheValueAsync("RentalList:All");
 
-                await _unitOfWork.Rentals.Add(rental);
-                var result = await _unitOfWork.SaveAsync();
-
-                if (result > 0)
-                {
-                    await transaction.CommitAsync();
-                    _notifier.Handle("Rental added successfully");
-
-                    PublishRentalRegisteredEvent(rental);
-                    await _redisCacheService.RemoveCacheValueAsync("RentalList:All");
-
-                    return true;
-                }
-
-                await transaction.RollbackAsync();
-                _notifier.Handle("Failed to add rental, rolling back transaction", NotificationType.Error);
-                return false;
+                return true;
             }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                HandleException(ex);
-                return false;
-            }
+
+            await transaction.RollbackAsync();
+            _notifier.Handle("Failed to add rental, rolling back transaction", NotificationType.Error);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            HandleException(ex);
+            return false;
         }
     }
 
@@ -198,38 +197,36 @@ public class RentalService : BaseService, IRentalService
             return false;
         }
 
-        using (var transaction = await _unitOfWork.BeginTransactionAsync())
+        using var transaction = await _unitOfWork.BeginTransactionAsync();
+        try
         {
-            try
+            UpdateRentalDetails(existingRental, rental, userEmail);
+
+            await _unitOfWork.Rentals.Update(existingRental);
+            var result = await _unitOfWork.SaveAsync();
+
+            if (result > 0)
             {
-                UpdateRentalDetails(existingRental, rental, userEmail);
+                await transaction.CommitAsync();
+                _notifier.Handle("Rental updated successfully");
 
-                _unitOfWork.Rentals.Update(existingRental);
-                var result = await _unitOfWork.SaveAsync();
+                PublishRentalRegisteredEvent(existingRental);
+                var cacheKey = $"Rental:{existingRental.Id}";
+                await _redisCacheService.SetCacheValueAsync(cacheKey, existingRental);
+                await _redisCacheService.RemoveCacheValueAsync("RentalList:All");
 
-                if (result > 0)
-                {
-                    await transaction.CommitAsync();
-                    _notifier.Handle("Rental updated successfully");
-
-                    PublishRentalRegisteredEvent(existingRental);
-                    var cacheKey = $"Rental:{existingRental.Id}";
-                    await _redisCacheService.SetCacheValueAsync(cacheKey, existingRental);
-                    await _redisCacheService.RemoveCacheValueAsync("RentalList:All");
-
-                    return true;
-                }
-
-                await transaction.RollbackAsync();
-                _notifier.Handle("Failed to update rental, rolling back transaction", NotificationType.Error);
-                return false;
+                return true;
             }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                HandleException(ex);
-                return false;
-            }
+
+            await transaction.RollbackAsync();
+            _notifier.Handle("Failed to update rental, rolling back transaction", NotificationType.Error);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            HandleException(ex);
+            return false;
         }
     }
 
@@ -250,37 +247,35 @@ public class RentalService : BaseService, IRentalService
                 return false;
             }
 
-            using (var transaction = await _unitOfWork.BeginTransactionAsync())
+            using var transaction = await _unitOfWork.BeginTransactionAsync();
+            try
             {
-                try
+                rental.UpdatedByUser = userEmail;
+                rental.ToggleIsDeleted();
+                await _unitOfWork.Rentals.Update(rental);
+                var result = await _unitOfWork.SaveAsync();
+
+                if (result > 0)
                 {
-                    rental.UpdatedByUser = userEmail;
-                    rental.ToggleIsDeleted();
-                    await _unitOfWork.Rentals.Update(rental);
-                    var result = await _unitOfWork.SaveAsync();
+                    await transaction.CommitAsync();
+                    _notifier.Handle("Rental soft deleted successfully");
 
-                    if (result > 0)
-                    {
-                        await transaction.CommitAsync();
-                        _notifier.Handle("Rental soft deleted successfully");
+                    var cacheKey = $"Rental:{rental.Id}";
+                    await _redisCacheService.RemoveCacheValueAsync(cacheKey);
+                    await _redisCacheService.RemoveCacheValueAsync("RentalList:All");
 
-                        var cacheKey = $"Rental:{rental.Id}";
-                        await _redisCacheService.RemoveCacheValueAsync(cacheKey);
-                        await _redisCacheService.RemoveCacheValueAsync("RentalList:All");
-
-                        return true;
-                    }
-
-                    await transaction.RollbackAsync();
-                    _notifier.Handle("Failed to soft delete rental, rolling back transaction", NotificationType.Error);
-                    return false;
+                    return true;
                 }
-                catch (Exception ex)
-                {
-                    await transaction.RollbackAsync();
-                    HandleException(ex);
-                    return false;
-                }
+
+                await transaction.RollbackAsync();
+                _notifier.Handle("Failed to soft delete rental, rolling back transaction", NotificationType.Error);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                HandleException(ex);
+                return false;
             }
         }
         catch (Exception ex)
@@ -293,7 +288,18 @@ public class RentalService : BaseService, IRentalService
     private async Task<(Vehicle, Courier)> GetForeignEntities(Guid vehicleId, Guid courierId)
     {
         var vehicle = await _unitOfWork.Vehicles.GetById(vehicleId);
+        if (vehicle is null)
+        {
+            _notifier.Handle("Vehicle not found", NotificationType.Error);
+            throw new InvalidOperationException($"Vehicle with ID '{vehicleId}' was not found.");
+        }
+
         var courier = await _unitOfWork.Couriers.GetById(courierId);
+        if (courier is null)
+        {
+            _notifier.Handle("Courier not found", NotificationType.Error);
+            throw new InvalidOperationException($"Courier with ID '{courierId}' was not found.");
+        }
 
         return (vehicle, courier);
     }
@@ -306,7 +312,7 @@ public class RentalService : BaseService, IRentalService
         existingRental.EndDate = rental.EndDate;
         existingRental.ExpectedEndDate = rental.ExpectedEndDate;
         existingRental.DailyRate = rental.DailyRate;
-        existingRental.TotalCost = CalculateRentalCost(existingRental).Result;
+        existingRental.TotalCost = CalculateRentalCost(existingRental);
         existingRental.Plan = rental.Plan;
         existingRental.UpdatedByUser = userEmail;
         existingRental.Update();

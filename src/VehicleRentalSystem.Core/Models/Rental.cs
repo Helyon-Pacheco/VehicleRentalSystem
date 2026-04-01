@@ -13,8 +13,8 @@ public class Rental : EntityBase
     public decimal TotalCost { get; set; }
     public RentalPlan Plan { get; set; }
 
-    public virtual Courier Courier { get; set; }
-    public virtual Vehicle Vehicle { get; set; }
+    public virtual Courier? Courier { get; set; }
+    public virtual Vehicle? Vehicle { get; set; }
 
     public Rental()
     {

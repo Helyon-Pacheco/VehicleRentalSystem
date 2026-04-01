@@ -8,7 +8,7 @@ using VehicleRentalSystem.Core.Interfaces.Notifications;
 using VehicleRentalSystem.Identity.Extensions;
 using VehicleRentalSystem.Identity.Interfaces;
 using VehicleRentalSystem.Identity.ViewModels;
-using VehicleRentalSystem.RentalServices.Services;
+using VehicleRentalSystem.Shared.Services;
 
 namespace VehicleRentalSystem.Identity.Services;
 
@@ -72,7 +72,7 @@ public class AuthService : BaseService, IAuthService
             var result = await _signInManager.PasswordSignInAsync(loginUser.Email, loginUser.Password, false, true);
             if (result.Succeeded)
             {
-                _logger.LogInformation($"User {loginUser.Email} logged in successfully");
+                _logger.LogInformation("User {Email} logged in successfully", loginUser.Email);
                 return await GenerateJwtAsync(loginUser.Email);
             }
             if (result.IsLockedOut)
@@ -99,7 +99,7 @@ public class AuthService : BaseService, IAuthService
         {
             if (await _roleManager.RoleExistsAsync(roleName))
             {
-                _logger.LogWarning($"Role {roleName} already exists.");
+                _logger.LogWarning("Role {RoleName} already exists.", roleName);
                 return false;
             }
 
@@ -108,19 +108,19 @@ public class AuthService : BaseService, IAuthService
 
             if (result.Succeeded)
             {
-                _logger.LogInformation($"Role {roleName} created successfully.");
+                _logger.LogInformation("Role {RoleName} created successfully.", roleName);
                 return true;
             }
 
             foreach (var error in result.Errors)
             {
-                _logger.LogError($"Error creating role: {error.Description}");
+                _logger.LogError("Error creating role: {ErrorDescription}", error.Description);
             }
             return false;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"An error occurred while creating the role {roleName}.");
+            _logger.LogError(ex, "An error occurred while creating the role {RoleName}.", roleName);
             return false;
         }
     }
@@ -132,7 +132,7 @@ public class AuthService : BaseService, IAuthService
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                _logger.LogWarning($"User with ID {userId} not found.");
+                _logger.LogWarning("User with ID {UserId} not found.", userId);
                 return false;
             }
 
@@ -148,7 +148,7 @@ public class AuthService : BaseService, IAuthService
                         {
                             foreach (var error in roleResult.Errors)
                             {
-                                _logger.LogError($"Error creating role: {error.Description}");
+                                _logger.LogError("Error creating role: {ErrorDescription}", error.Description);
                             }
                             return false;
                         }
@@ -161,7 +161,7 @@ public class AuthService : BaseService, IAuthService
                         {
                             foreach (var error in result.Errors)
                             {
-                                _logger.LogError($"Error adding role to user: {error.Description}");
+                                _logger.LogError("Error adding role to user: {ErrorDescription}", error.Description);
                             }
                             return false;
                         }
@@ -182,7 +182,7 @@ public class AuthService : BaseService, IAuthService
                         {
                             foreach (var error in result.Errors)
                             {
-                                _logger.LogError($"Error adding claim to user: {error.Description}");
+                                _logger.LogError("Error adding claim to user: {ErrorDescription}", error.Description);
                             }
                             return false;
                         }
@@ -190,12 +190,12 @@ public class AuthService : BaseService, IAuthService
                 }
             }
 
-            _logger.LogInformation($"Roles and/or claims assigned to user {userId} successfully.");
+            _logger.LogInformation("Roles and/or claims assigned to user {UserId} successfully.", userId);
             return true;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"An error occurred while assigning roles and/or claims to the user {userId}.");
+            _logger.LogError(ex, "An error occurred while assigning roles and/or claims to the user {UserId}.", userId);
             return false;
         }
     }
@@ -208,6 +208,12 @@ public class AuthService : BaseService, IAuthService
             if (user == null)
             {
                 HandleException(new Exception("User not found."));
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(user.Email))
+            {
+                HandleException(new Exception("User email is not configured."));
                 return null;
             }
 

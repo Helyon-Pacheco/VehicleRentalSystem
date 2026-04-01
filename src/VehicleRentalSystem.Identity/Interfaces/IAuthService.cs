@@ -16,7 +16,7 @@ public interface IAuthService
     /// </summary>
     /// <param name="loginUser">The user login details.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the login response.</returns>
-    Task<LoginResponseViewModel> LoginAsync(LoginUserViewModel loginUser);
+    Task<LoginResponseViewModel?> LoginAsync(LoginUserViewModel loginUser);
 
     /// <summary>
     /// Adds a new role.
@@ -39,5 +39,5 @@ public interface IAuthService
     /// </summary>
     /// <param name="email">The user's email.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the login response.</returns>
-    Task<LoginResponseViewModel> GenerateJwtAsync(string email);
+    Task<LoginResponseViewModel?> GenerateJwtAsync(string email);
 }

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using VehicleRentalSystem.Core.Interfaces.Notifications;
 using VehicleRentalSystem.Core.Interfaces.Services;
 using VehicleRentalSystem.Shared.Configurations;
+using VehicleRentalSystem.Shared.Services;
 
 namespace VehicleRentalSystem.RentalServices.Services;
 

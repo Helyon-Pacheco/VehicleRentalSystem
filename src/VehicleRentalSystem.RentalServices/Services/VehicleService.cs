@@ -8,6 +8,7 @@ using VehicleRentalSystem.Core.Models.Enums;
 using VehicleRentalSystem.Core.Models.Validations;
 using VehicleRentalSystem.Core.Notifications;
 using VehicleRentalSystem.Messaging.Events;
+using VehicleRentalSystem.Shared.Services;
 
 namespace VehicleRentalSystem.RentalServices.Services;
 
@@ -24,7 +25,7 @@ public class VehicleService : BaseService, IVehicleService
         _redisCacheService = redisCacheService ?? throw new ArgumentNullException(nameof(redisCacheService));
     }
 
-    public async Task<Vehicle> GetById(Guid id)
+    public async Task<Vehicle?> GetById(Guid id)
     {
         try
         {
@@ -66,7 +67,7 @@ public class VehicleService : BaseService, IVehicleService
         }
     }
 
-    public async Task<Vehicle> GetByPlate(string plate)
+    public async Task<Vehicle?> GetByPlate(string plate)
     {
         try
         {
@@ -80,7 +81,7 @@ public class VehicleService : BaseService, IVehicleService
         }
     }
 
-    public async Task<Vehicle> GetByType(VehicleType vehicleType)
+    public async Task<Vehicle?> GetByType(VehicleType vehicleType)
     {
         try
         {
@@ -108,7 +109,7 @@ public class VehicleService : BaseService, IVehicleService
         }
     }
 
-    public async Task<VehicleNotification> GetVehicleNotification(Guid id)
+    public async Task<VehicleNotification?> GetVehicleNotification(Guid id)
     {
         try
         {

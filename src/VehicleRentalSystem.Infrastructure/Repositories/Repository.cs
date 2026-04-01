@@ -142,12 +142,14 @@ public abstract class Repository<TEntity> : IRepository<TEntity> where TEntity :
         }
     }
 
-    public virtual async Task Update(TEntity entity)
+    public virtual Task Update(TEntity entity)
     {
         try
         {
             _notifier.Handle($"Updating {typeof(TEntity).Name}.");
             _dataContext.Entry(entity).State = EntityState.Modified;
+
+            return Task.CompletedTask;
         }
         catch (Exception ex)
         {
@@ -156,12 +158,14 @@ public abstract class Repository<TEntity> : IRepository<TEntity> where TEntity :
         }
     }
 
-    public virtual async Task UpdateRange(IEnumerable<TEntity> entities)
+    public virtual Task UpdateRange(IEnumerable<TEntity> entities)
     {
         try
         {
             _notifier.Handle($"Updating range of {typeof(TEntity).Name}.");
             _dbSet.UpdateRange(entities);
+
+            return Task.CompletedTask;
         }
         catch (Exception ex)
         {

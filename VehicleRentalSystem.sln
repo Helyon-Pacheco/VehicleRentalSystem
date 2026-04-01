@@ -40,10 +40,16 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleRentalSystem.Shared", "src\VehicleRentalSystem.Shared\VehicleRentalSystem.Shared.csproj", "{89D0AE03-5FB8-4010-9F52-7B9601F94097}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleRentalSystem.Api", "src\VehicleRentalSystem.Api\VehicleRentalSystem.Api.csproj", "{CEB7494B-CF4B-48DC-9CE9-D328B1206FE3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{962708C8-B086-44A1-96E5-D25B27C0B7C1} = {962708C8-B086-44A1-96E5-D25B27C0B7C1}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleRentalSystem.Infrastructure", "src\VehicleRentalSystem.Infrastructure\VehicleRentalSystem.Infrastructure.csproj", "{962708C8-B086-44A1-96E5-D25B27C0B7C1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleRentalSystem.RentalServices", "src\VehicleRentalSystem.RentalServices\VehicleRentalSystem.RentalServices.csproj", "{54652651-5FF3-4CAB-95F3-8FB441F645AB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E00EE224-AFC6-4CBA-AC01-72881AB4738A} = {E00EE224-AFC6-4CBA-AC01-72881AB4738A}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleRentalSystem.Messaging", "src\VehicleRentalSystem.Messaging\VehicleRentalSystem.Messaging.csproj", "{11CF4A4D-1AFA-485E-B64F-99A3B22F628F}"
 EndProject

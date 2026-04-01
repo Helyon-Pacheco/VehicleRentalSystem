@@ -5,7 +5,7 @@ using VehicleRentalSystem.Core.Interfaces.Notifications;
 using VehicleRentalSystem.Core.Models;
 using VehicleRentalSystem.Core.Notifications;
 
-namespace VehicleRentalSystem.RentalServices.Services;
+namespace VehicleRentalSystem.Shared.Services;
 
 public class BaseService
 {

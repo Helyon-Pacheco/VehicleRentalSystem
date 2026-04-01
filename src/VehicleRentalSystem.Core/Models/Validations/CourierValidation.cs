@@ -77,9 +77,12 @@ public class CourierValidation : AbstractValidator<Courier>
     public async Task<ValidationResult> ValidateImageAsync(Courier courier)
     {
         var imageValidator = new InlineValidator<Courier>();
+
         imageValidator.RuleFor(c => c.CnhImage)
             .NotEmpty().WithMessage("The CNH Image cannot be empty.")
-            .Must(image => image.EndsWith(".png") || image.EndsWith(".bmp")).WithMessage("The CNH Image must be a PNG or BMP file.");
+            .Must(image => image!.EndsWith(".png") || image.EndsWith(".bmp"))
+                .WithMessage("The CNH Image must be a PNG or BMP file.")
+            .When(c => !string.IsNullOrEmpty(c.CnhImage));
 
         return await imageValidator.ValidateAsync(courier);
     }

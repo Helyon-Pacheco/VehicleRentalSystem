@@ -8,7 +8,7 @@ namespace VehicleRentalSystem.Infrastructure.UoW;
 public class UnitOfWork : IUnitOfWork
 {
     private readonly DataContext _dataContext;
-    private IDbContextTransaction _transaction;
+    private IDbContextTransaction? _transaction;
 
     public IVehicleRepository Vehicles {  get; }
     public ICourierRepository Couriers { get; }

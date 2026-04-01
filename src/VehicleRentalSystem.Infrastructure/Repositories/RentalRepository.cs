@@ -55,7 +55,7 @@ public class RentalRepository : Repository<Rental>, IRentalRepository
         }
     }
 
-    public async Task<decimal> CalculateRentalCost(Rental rental)
+    public decimal CalculateRentalCost(Rental rental)
     {
         if (rental == null)
         {

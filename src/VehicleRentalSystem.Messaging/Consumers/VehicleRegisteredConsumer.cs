@@ -15,7 +15,7 @@ public class VehicleRegisteredConsumer : IMessageConsumer
     private readonly IChannel _channel;
     private readonly ILogger<VehicleRegisteredConsumer> _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
-    private readonly string _queueName = "motorcycle_queue";
+    private readonly string _queueName = "vehicle_queue";
 
     public VehicleRegisteredConsumer(IChannel channel, ILogger<VehicleRegisteredConsumer> logger, IServiceScopeFactory serviceScopeFactory)
     {
@@ -33,13 +33,20 @@ public class VehicleRegisteredConsumer : IMessageConsumer
             {
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
-                var motorcycleRegisteredEvent = JsonConvert.DeserializeObject<VehicleRegistered>(message);
+                var vehicleRegisteredEvent = JsonConvert.DeserializeObject<VehicleRegistered>(message);
+
+                if (vehicleRegisteredEvent is null)
+                {
+                    _logger.LogWarning("Received null or invalid message from queue '{Queue}'. Discarding.", _queueName);
+                    await _channel.BasicNackAsync(ea.DeliveryTag, false, requeue: false);
+                    return;
+                }
 
                 using (var scope = _serviceScopeFactory.CreateScope())
                 {
                     var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
                     var cacheService = scope.ServiceProvider.GetRequiredService<IRedisCacheService>();
-                    await ProcessMessageAsync(motorcycleRegisteredEvent, unitOfWork, cacheService);
+                    await ProcessMessageAsync(vehicleRegisteredEvent, unitOfWork, cacheService);
                 }
 
                 await _channel.BasicAckAsync(ea.DeliveryTag, false);
@@ -47,7 +54,6 @@ public class VehicleRegisteredConsumer : IMessageConsumer
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing message");
-
                 await _channel.BasicNackAsync(ea.DeliveryTag, false, true);
             }
         };
