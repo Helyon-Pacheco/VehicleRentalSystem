@@ -5,7 +5,6 @@ using VehicleRentalSystem.Core.Interfaces.Repositories;
 using VehicleRentalSystem.Core.Interfaces.Services;
 using VehicleRentalSystem.Core.Interfaces.UoW;
 using VehicleRentalSystem.Core.Notifications;
-using VehicleRentalSystem.Infrastructure.Repositories;
 using VehicleRentalSystem.Infrastructure.UoW;
 using VehicleRentalSystem.Messaging.Configurations;
 using VehicleRentalSystem.Messaging.Services;

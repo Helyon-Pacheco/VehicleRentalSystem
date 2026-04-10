@@ -82,7 +82,7 @@ public class ApiSettings
     private static void ConfigureAdditionalServices(IServiceCollection services, IConfiguration configuration)
     {
         services.ConfigureAutomapper();
-        services.AddDependencyInjection(configuration);
+        services.AddRentalServicesDependencies(configuration);
         services.AddApiVersioningConfiguration();
         services.AddSwaggerConfig();
         services.AddHealthCheckConfiguration(configuration);

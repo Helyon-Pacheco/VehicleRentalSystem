@@ -87,10 +87,10 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
     {
         var info = new OpenApiInfo
         {
-            Title = "Bike Rental System",
+            Title = "Vehicle Rental System",
             Version = description.ApiVersion.ToString(),
-            Description = "Desafio Backend Mottu.",
-            Contact = new OpenApiContact { Name = "Tiago Nogueira", Email = "contato.tigasnogueira@gmail.com" },
+            Description = "System to manage vehicle rentals.",
+            Contact = new OpenApiContact { Name = "Helyon Pacheco", Email = "helyonftp@hotmail.com" },
             License = new OpenApiLicense { Name = "MIT", Url = new Uri("https://opensource.org/licenses/MIT") }
         };
 
