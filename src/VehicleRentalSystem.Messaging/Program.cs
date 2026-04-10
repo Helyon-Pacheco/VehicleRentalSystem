@@ -1,6 +1,10 @@
-var builder = WebApplication.CreateBuilder(args);
-var app = builder.Build();
+using VehicleRentalSystem.Messaging.Configurations;
 
-app.MapGet("/", () => "Hello World!");
+var builder = Host.CreateApplicationBuilder(args);
 
-app.Run();
+var messagingSettings = new MessagingSettings();
+messagingSettings.ConfigureServices(builder.Services, builder.Configuration);
+
+var host = builder.Build();
+
+host.Run();
